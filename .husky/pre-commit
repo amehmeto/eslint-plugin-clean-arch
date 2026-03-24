@@ -1,0 +1,2 @@
+sh .husky/scripts/no-commits-on-main.sh
+sh .husky/scripts/no-commits-on-merged-branch.sh
