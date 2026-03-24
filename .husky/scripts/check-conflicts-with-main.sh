@@ -20,7 +20,8 @@ fi
 # Check for merge conflicts using merge-tree (requires Git 2.38+)
 merge_base="$(git merge-base HEAD origin/main 2>/dev/null)"
 if [ -n "$merge_base" ]; then
-  conflicts="$(git merge-tree --write-tree --no-messages HEAD origin/main 2>&1)" || {
+  # Requires Git 2.38+ for --write-tree/--no-messages flags
+  git merge-tree --write-tree --no-messages HEAD origin/main >/dev/null 2>&1 || {
     printf "\n❌ Your branch has merge conflicts with main.\n"
     printf "   Please rebase and resolve conflicts before pushing:\n"
     printf "   git rebase origin/main\n\n"
