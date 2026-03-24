@@ -1,0 +1,104 @@
+# ──────────────────────────────────────────────────────────────
+#
+#                          ▄▄▄████████▄▄▄
+#                       ▄██▀▀          ▀▀██▄
+#                     ▄█▀   ╱▔▔▔▔▔▔▔▔╲   ▀█▄
+#                    █▀    │  ◈    ◈  │    ▀█
+#                   █│      ╲▁▁▄▄▁▁▁╱      │█
+#                   █│        ╱    ╲        │█
+#                   █│     ▄▄▀      ▀▄▄     │█
+#                    █▄  ▄█   HADES    █▄  ▄█
+#                     ▀██▀ ░░░░░░░░░░░░ ▀██▀
+#                       ║  ░ UNDERWORLD ░  ║
+#                       ║  ░░░░░░░░░░░░░░  ║
+#                       ║▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄║
+#                      ╱▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓╲
+#                     ╱▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓╲
+#                    ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+#
+#             « What is merged descends to the underworld forever »
+#
+#                         Cache  │  Release
+#
+# ──────────────────────────────────────────────────────────────
+
+# Hades (ᾍδης) - Ruler of the underworld
+# https://www.wikiwand.com/en/articles/Hades
+#
+# Once code passes Cerberus's inspection and is merged,
+# it enters Hades's domain — coverage is cached and
+# releases are cut.
+
+name: Hades
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    # Run weekly on Sunday at 00:00 UTC to keep coverage cache alive
+    # GitHub caches expire after 7 days of no access
+    - cron: '0 0 * * 0'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hecate:
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/hecate.yml
+
+  # Cache coverage on main for PR comparisons
+  cache-coverage:
+    needs: hecate
+    if: github.event_name == 'push' && needs.hecate.outputs.app-changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:cov
+
+      - name: Copy coverage for caching
+        run: mkdir -p /tmp/base-coverage && cp coverage/coverage-summary.json /tmp/base-coverage/
+
+      - name: Save coverage to cache
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/base-coverage/coverage-summary.json
+          key: coverage-main-${{ github.sha }}
+
+  # Refresh coverage cache weekly to prevent expiration
+  refresh-coverage-cache:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Restore coverage from cache
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/base-coverage/coverage-summary.json
+          key: coverage-main-refresh
+          restore-keys: |
+            coverage-main-
+
+      - name: Re-save coverage to refresh expiration
+        if: steps.cache-restore.outputs.cache-hit != ''
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/base-coverage/coverage-summary.json
+          key: coverage-main-refresh-${{ github.run_id }}

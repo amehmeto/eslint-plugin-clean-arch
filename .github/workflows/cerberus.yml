@@ -1,0 +1,171 @@
+# ──────────────────────────────────────────────────────────────
+#
+#                     ╱▔▔╲       ╱▔▔╲       ╱▔▔╲
+#                    │ ◉◉ │     │ ◉◉ │     │ ◉◉ │
+#                     ╲▂▂╱  ╲   │╱  ╲│   ╱  ╲▂▂╱
+#                       ╲    ╲▁▁▁▁▁▁▁╱    ╱
+#                        ╲▁▁▁▁▁▁▁▁▁▁▁▁▁▁╱
+#                           │ CERBERUS │
+#                           │▓▓▓▓▓▓▓▓▓▓│
+#                          ╱│          │╲
+#                         ╱ │          │ ╲
+#                        ╱  │          │  ╲
+#                      ╱▔╲ ╱▔╲        ╱▔╲ ╱▔╲
+#                     │░░│ │░░│      │░░│ │░░│
+#                      ▔▔   ▔▔        ▔▔   ▔▔
+#
+#           « None shall merge without passing all heads »
+#
+#              HEAD 1: Test  │  HEAD 2: Coverage
+#
+# ──────────────────────────────────────────────────────────────
+
+# Cerberus (Κέρβερος) - Three-headed guardian of the underworld
+# https://www.wikiwand.com/en/articles/Cerberus
+#
+# Named after the three-headed hound guarding the gates of the underworld.
+# This workflow acts as a guardian, ensuring code quality through tests
+# and coverage checks before allowing passage.
+
+name: Cerberus
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hecate:
+    uses: ./.github/workflows/hecate.yml
+
+  # Skip tests for docs-only changes
+  docs-only:
+    needs: hecate
+    if: needs.hecate.outputs.docs-only == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Docs-only change — skipping tests."
+
+  test:
+    needs: hecate
+    if: needs.hecate.outputs.app-changed == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test:run
+
+  coverage:
+    needs: hecate
+    if: needs.hecate.outputs.app-changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:cov
+
+      - name: Store PR coverage
+        run: |
+          mkdir -p /tmp/pr-coverage
+          cp coverage/coverage-summary.json /tmp/pr-coverage/
+
+      - name: Restore base branch coverage from cache
+        id: cache-coverage
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/base-coverage/coverage-summary.json
+          key: coverage-main-${{ github.event.pull_request.base.sha }}
+          restore-keys: |
+            coverage-main-
+
+      - name: Compare coverage
+        if: steps.cache-coverage.outputs.cache-hit != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            const basePath = '/tmp/base-coverage/coverage-summary.json';
+            const prPath = '/tmp/pr-coverage/coverage-summary.json';
+
+            if (!fs.existsSync(basePath) || !fs.existsSync(prPath)) {
+              console.log('Coverage files not found, skipping comparison');
+              return;
+            }
+
+            const base = JSON.parse(fs.readFileSync(basePath, 'utf8'));
+            const pr = JSON.parse(fs.readFileSync(prPath, 'utf8'));
+
+            const metrics = ['lines', 'branches', 'functions', 'statements'];
+            const rows = metrics.map(m => {
+              const basePct = base.total[m].pct;
+              const prPct = pr.total[m].pct;
+              const diff = (prPct - basePct).toFixed(2);
+              const icon = diff > 0 ? '🟢' : diff < 0 ? '🔴' : '⚪';
+              return `| ${m} | ${basePct}% | ${prPct}% | ${icon} ${diff > 0 ? '+' : ''}${diff}% |`;
+            });
+
+            const body = [
+              '## Coverage Report',
+              '',
+              '| Metric | Base | PR | Diff |',
+              '|--------|------|-----|------|',
+              ...rows,
+              '',
+              `_Compared against \`${context.payload.pull_request.base.ref}\`_`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(c => c.body.includes('## Coverage Report'));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

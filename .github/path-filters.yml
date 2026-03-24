@@ -1,0 +1,23 @@
+# Shared path filter definitions
+# Used by Hecate workflow for both PR-level and push-level checks
+
+# Source code (triggers full test suite)
+src:
+  - 'src/**'
+
+# Test files
+tests:
+  - 'tests/**'
+  - 'vitest.config.ts'
+
+# Config files that affect behavior
+config:
+  - 'package.json'
+  - 'package-lock.json'
+  - 'tsconfig.json'
+
+# Documentation only (no tests needed)
+docs:
+  - '**/*.md'
+  - '.github/**'
+  - 'LICENSE'
