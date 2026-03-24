@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "strict": true
+  },
+  "include": ["tests/**/*.ts"]
+}

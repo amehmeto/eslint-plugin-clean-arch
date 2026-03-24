@@ -1,0 +1,44 @@
+{
+  "name": "eslint-plugin-clean-arch",
+  "version": "0.1.0",
+  "description": "ESLint plugin enforcing clean/hexagonal architecture boundaries, code quality, and naming conventions. Compatible with both ESLint and oxlint.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./configs/*": "./src/configs/*.js"
+  },
+  "main": "./src/index.js",
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "clean-architecture",
+    "hexagonal-architecture",
+    "oxlint",
+    "code-quality",
+    "naming-conventions"
+  ],
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest --run",
+    "test:cov": "vitest --run --coverage"
+  },
+  "peerDependencies": {
+    "eslint": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "^8.56.1",
+    "eslint": "^8.57.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.0"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
