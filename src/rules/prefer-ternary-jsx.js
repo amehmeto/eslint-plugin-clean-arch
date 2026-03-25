@@ -97,8 +97,13 @@ export default {
             messageId: 'preferTernary',
             data: { positive: positiveName },
             fix(fixer) {
+              const first =
+                positive.node.range[0] < negative.node.range[0]
+                  ? positive
+                  : negative
+              const second = first === positive ? negative : positive
               return fixer.replaceTextRange(
-                [positive.node.range[0], negative.node.range[1]],
+                [first.node.range[0], second.node.range[1]],
                 `{${positiveName} ? ${positiveJsx} : ${negativeJsx}}`,
               )
             },

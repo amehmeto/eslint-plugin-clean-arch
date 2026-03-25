@@ -86,7 +86,7 @@ export default {
             const returnText = consequentReturn.argument
               ? `return ${currentReturnText}`
               : 'return'
-            const merged = `if (${prevTestText} || ${currentTestText}) ${returnText};`
+            const merged = `if (${prevTestText} || ${currentTestText}) ${returnText}`
             return fixer.replaceTextRange(
               [prev.range[0], node.range[1]],
               merged,

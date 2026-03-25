@@ -70,7 +70,7 @@ describe('no-else-if', () => {
           output: `
         if (a) {
           doA()
-        } else {\n          if (b) {\n          doB()\n        }\n        }
+        } else {\n          if (b) {\n          doB()\n          }\n        }
       `,
           errors: [{ messageId: 'noElseIf' }],
         },
@@ -88,7 +88,7 @@ describe('no-else-if', () => {
           output: `
         if (a) {
           doA()
-        } else {\n          if (b) {\n          doB()\n        } else if (c) {\n          doC()\n        }\n        }
+        } else {\n          if (b) {\n          doB()\n          } else if (c) {\n          doC()\n          }\n        }
       `,
           errors: [{ messageId: 'noElseIf' }, { messageId: 'noElseIf' }],
         },
@@ -106,7 +106,7 @@ describe('no-else-if', () => {
           output: `
         if (a) {
           doA()
-        } else {\n          if (b) {\n          doB()\n        } else {\n          doC()\n        }\n        }
+        } else {\n          if (b) {\n          doB()\n          } else {\n          doC()\n          }\n        }
       `,
           errors: [{ messageId: 'noElseIf' }],
         },

@@ -60,7 +60,7 @@ describe('prefer-ternary-jsx', () => {
         // Negation first, positive second
         {
           code: `<div>{!isLocked && <CheckBox />}{isLocked && <LockIcon />}</div>`,
-          output: `<div>{!isLocked && <CheckBox />}{isLocked ? <LockIcon /> : <CheckBox />}{isLocked && <LockIcon />}</div>`,
+          output: `<div>{isLocked ? <LockIcon /> : <CheckBox />}</div>`,
           errors: [
             {
               messageId: 'preferTernary',

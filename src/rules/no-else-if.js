@@ -34,10 +34,15 @@ export default {
             messageId: 'noElseIf',
             fix(fixer) {
               const alternateText = sourceCode.getText(node.alternate)
-              const indent = ' '.repeat(node.loc.start.column)
+              const baseIndent = ' '.repeat(node.loc.start.column)
+              const innerIndent = baseIndent + '  '
+              const reindented = alternateText
+                .split('\n')
+                .map((line, i) => (i === 0 ? line : innerIndent + line.trimStart()))
+                .join('\n')
               return fixer.replaceText(
                 node.alternate,
-                `{\n${indent}  ${alternateText}\n${indent}}`,
+                `{\n${innerIndent}${reindented}\n${baseIndent}}`,
               )
             },
           })
