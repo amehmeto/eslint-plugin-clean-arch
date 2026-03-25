@@ -70,6 +70,10 @@ describe('no-enum-value-as-string-literal', () => {
             enum FormMode { Create = 'create', Edit = 'edit' }
             const isEdit = mode === 'edit'
           `,
+          output: `
+            enum FormMode { Create = 'create', Edit = 'edit' }
+            const isEdit = mode === FormMode.Edit
+          `,
           errors: [
             {
               messageId: 'useEnumValue',
@@ -86,6 +90,10 @@ describe('no-enum-value-as-string-literal', () => {
           code: `
             enum Status { Active = 'active' }
             const isInactive = status !== 'active'
+          `,
+          output: `
+            enum Status { Active = 'active' }
+            const isInactive = status !== Status.Active
           `,
           errors: [
             {
@@ -104,6 +112,10 @@ describe('no-enum-value-as-string-literal', () => {
             enum FormMode { Edit = 'edit' }
             const isEdit = 'edit' === mode
           `,
+          output: `
+            enum FormMode { Edit = 'edit' }
+            const isEdit = FormMode.Edit === mode
+          `,
           errors: [
             {
               messageId: 'useEnumValue',
@@ -121,6 +133,11 @@ describe('no-enum-value-as-string-literal', () => {
             enum FormMode { Create = 'create', Edit = 'edit' }
             const isCreate = mode === 'create'
             const isEdit = mode === 'edit'
+          `,
+          output: `
+            enum FormMode { Create = 'create', Edit = 'edit' }
+            const isCreate = mode === FormMode.Create
+            const isEdit = mode === FormMode.Edit
           `,
           errors: [
             {
@@ -145,6 +162,10 @@ describe('no-enum-value-as-string-literal', () => {
         {
           code: `
             const isEdit = mode === 'edit'
+            enum FormMode { Edit = 'edit' }
+          `,
+          output: `
+            const isEdit = mode === FormMode.Edit
             enum FormMode { Edit = 'edit' }
           `,
           errors: [

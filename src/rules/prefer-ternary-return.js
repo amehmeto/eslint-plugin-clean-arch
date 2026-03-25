@@ -24,6 +24,7 @@ export default {
       preferTernary:
         'Prefer ternary: `return {{condition}} ? {{consequent}} : {{alternate}}`',
     },
+    fixable: 'code',
     schema: [
       {
         type: 'object',
@@ -138,6 +139,14 @@ export default {
         if (consequentLines > 0 || alternateLines > 0) return
 
         // Report the issue
+        const condText = sourceCode.getText(node.test)
+        const consText = consequentReturn.argument
+          ? sourceCode.getText(consequentReturn.argument)
+          : 'undefined'
+        const altText = nextStatement.argument
+          ? sourceCode.getText(nextStatement.argument)
+          : 'undefined'
+
         context.report({
           node,
           messageId: 'preferTernary',
@@ -145,6 +154,12 @@ export default {
             condition: getExpressionText(node.test),
             consequent: getExpressionText(consequentReturn.argument),
             alternate: getExpressionText(nextStatement.argument),
+          },
+          fix(fixer) {
+            return fixer.replaceTextRange(
+              [node.range[0], nextStatement.range[1]],
+              `return ${condText} ? ${consText} : ${altText}`,
+            )
           },
         })
       },

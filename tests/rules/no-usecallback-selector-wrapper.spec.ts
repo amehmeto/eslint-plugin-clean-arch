@@ -115,12 +115,20 @@ describe('no-usecallback-selector-wrapper', () => {
         const selectIsActive = useCallback((state) => selectIsStrictModeActive(state, dep), [])
         const isActive = useSelector(selectIsActive)
       `,
+          output: `
+        const selectIsActive = (state) => selectIsStrictModeActive(state, dep)
+        const isActive = useSelector(selectIsActive)
+      `,
           errors: [{ messageId: 'unnecessaryWrapper' }],
         },
         // With TypeScript-style type annotation pattern
         {
           code: `
         const selectTimeLeft = useCallback((state) => selectStrictModeTimeLeft(state, dateProvider), [])
+        const timeLeft = useSelector(selectTimeLeft)
+      `,
+          output: `
+        const selectTimeLeft = (state) => selectStrictModeTimeLeft(state, dateProvider)
         const timeLeft = useSelector(selectTimeLeft)
       `,
           errors: [{ messageId: 'unnecessaryWrapper' }],
@@ -130,6 +138,12 @@ describe('no-usecallback-selector-wrapper', () => {
           code: `
         const selectA = useCallback((state) => getA(state), [])
         const selectB = useCallback((state) => getB(state), [])
+        const a = useSelector(selectA)
+        const b = useSelector(selectB)
+      `,
+          output: `
+        const selectA = (state) => getA(state)
+        const selectB = (state) => getB(state)
         const a = useSelector(selectA)
         const b = useSelector(selectB)
       `,
@@ -144,12 +158,20 @@ describe('no-usecallback-selector-wrapper', () => {
         const selectFoo = useCallback((s) => getFoo(s, config), [])
         const foo = useSelector(selectFoo)
       `,
+          output: `
+        const selectFoo = (s) => getFoo(s, config)
+        const foo = useSelector(selectFoo)
+      `,
           errors: [{ messageId: 'unnecessaryWrapper' }],
         },
         // Function expression as callback
         {
           code: `
         const selectFn = useCallback(function(state) { return state.foo }, [])
+        const foo = useSelector(selectFn)
+      `,
+          output: `
+        const selectFn = function(state) { return state.foo }
         const foo = useSelector(selectFn)
       `,
           errors: [{ messageId: 'unnecessaryWrapper' }],

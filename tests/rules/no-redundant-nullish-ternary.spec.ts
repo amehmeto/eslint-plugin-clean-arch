@@ -76,66 +76,79 @@ describe('no-redundant-nullish-ternary', () => {
         // Basic case: false alternate
         {
           code: `const isLocked = x ? fn(x) : false`,
+          output: `const isLocked = fn(x)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // null alternate
         {
           code: `const result = x ? fn(x, a, b) : null`,
+          output: `const result = fn(x, a, b)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // undefined alternate
         {
           code: `const result = x ? fn(x) : undefined`,
+          output: `const result = fn(x)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // Zero alternate
         {
           code: `const result = x ? fn(x) : 0`,
+          output: `const result = fn(x)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // Empty string alternate
         {
           code: `const result = x ? fn(x) : ""`,
+          output: `const result = fn(x)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // Empty array alternate
         {
           code: `const result = x ? fn(x) : []`,
+          output: `const result = fn(x)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // Real-world case from PR
         {
           code: `const isLocked = lockedSirens ? isSirenLocked(lockedSirens, type, id) : false`,
+          output: `const isLocked = isSirenLocked(lockedSirens, type, id)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // Member expression callee
         {
           code: `const result = x ? obj.method(x) : false`,
+          output: `const result = obj.method(x)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // Variable among multiple arguments
         {
           code: `const result = data ? process(a, data, b) : null`,
+          output: `const result = process(a, data, b)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // Flipped: !x ? false : fn(x)
         {
           code: `const isLocked = !x ? false : fn(x)`,
+          output: `const isLocked = fn(x)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // Flipped: !x ? null : fn(x, a, b)
         {
           code: `const result = !x ? null : fn(x, a, b)`,
+          output: `const result = fn(x, a, b)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // Flipped: !x ? undefined : obj.method(x)
         {
           code: `const result = !x ? undefined : obj.method(x)`,
+          output: `const result = obj.method(x)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
         // Flipped real-world case
         {
           code: `const isLocked = !lockedSirens ? false : isSirenLocked(lockedSirens, type, id)`,
+          output: `const isLocked = isSirenLocked(lockedSirens, type, id)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
       ],

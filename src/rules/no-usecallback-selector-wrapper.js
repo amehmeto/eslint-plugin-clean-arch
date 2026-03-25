@@ -16,9 +16,11 @@ export default {
       unnecessaryWrapper:
         'Unnecessary useCallback wrapper around selector. Pass the selector directly to useSelector as an inline function instead.',
     },
+    fixable: 'code',
     schema: [],
   },
   create(context) {
+    const sourceCode = context.getSourceCode()
     // Track variables assigned from useCallback with empty deps
     const useCallbackWithEmptyDeps = new Map()
 
@@ -74,6 +76,13 @@ export default {
             context.report({
               node: useCallbackNode,
               messageId: 'unnecessaryWrapper',
+              fix(fixer) {
+                const callbackArg = useCallbackNode.arguments[0]
+                return fixer.replaceText(
+                  useCallbackNode,
+                  sourceCode.getText(callbackArg),
+                )
+              },
             })
           }
         }

@@ -22,6 +22,7 @@ export default {
       category: 'Best Practices',
       recommended: false,
     },
+    fixable: 'code',
     messages: {
       extractArgument:
         'Extract this complex expression to a variable. Arguments with operators and long strings should be extracted for readability.',
@@ -143,6 +144,23 @@ export default {
             context.report({
               node: arg,
               messageId: 'extractArgument',
+              fix(fixer) {
+                const sourceCode = context.getSourceCode()
+                const varName = functionName ? `${functionName}Arg` : 'extracted'
+                const exprText = sourceCode.getText(arg)
+                let stmt = node
+                while (stmt.parent && stmt.parent.type !== 'Program' && stmt.parent.type !== 'BlockStatement') {
+                  stmt = stmt.parent
+                }
+                const indent = sourceCode.getText().slice(
+                  sourceCode.getIndexFromLoc({ line: stmt.loc.start.line, column: 0 }),
+                  stmt.range[0]
+                )
+                return [
+                  fixer.insertTextBefore(stmt, `const ${varName} = ${exprText}\n${indent}`),
+                  fixer.replaceText(arg, varName)
+                ]
+              },
             })
           }
         }

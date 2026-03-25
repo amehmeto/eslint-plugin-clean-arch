@@ -22,6 +22,7 @@ export default {
       category: 'Best Practices',
       recommended: false,
     },
+    fixable: 'code',
     messages: {
       mergeReturns:
         'Consecutive if-return statements return the same value. Merge conditions with `||`.',
@@ -78,6 +79,19 @@ export default {
         context.report({
           node,
           messageId: 'mergeReturns',
+          fix(fixer) {
+            const prev = siblings[index - 1]
+            const prevTestText = sourceCode.getText(prev.test)
+            const currentTestText = sourceCode.getText(node.test)
+            const returnText = consequentReturn.argument
+              ? `return ${currentReturnText}`
+              : 'return'
+            const merged = `if (${prevTestText} || ${currentTestText}) ${returnText};`
+            return fixer.replaceTextRange(
+              [prev.range[0], node.range[1]],
+              merged,
+            )
+          },
         })
       },
     }

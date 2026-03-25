@@ -67,6 +67,11 @@ describe('no-else-if', () => {
           doB()
         }
       `,
+          output: `
+        if (a) {
+          doA()
+        } else {\n          if (b) {\n          doB()\n        }\n        }
+      `,
           errors: [{ messageId: 'noElseIf' }],
         },
         // Chained else-if - NOT OK (reports each else-if)
@@ -80,6 +85,11 @@ describe('no-else-if', () => {
           doC()
         }
       `,
+          output: `
+        if (a) {
+          doA()
+        } else {\n          if (b) {\n          doB()\n        } else if (c) {\n          doC()\n        }\n        }
+      `,
           errors: [{ messageId: 'noElseIf' }, { messageId: 'noElseIf' }],
         },
         // else-if with final else - NOT OK
@@ -92,6 +102,11 @@ describe('no-else-if', () => {
         } else {
           doC()
         }
+      `,
+          output: `
+        if (a) {
+          doA()
+        } else {\n          if (b) {\n          doB()\n        } else {\n          doC()\n        }\n        }
       `,
           errors: [{ messageId: 'noElseIf' }],
         },

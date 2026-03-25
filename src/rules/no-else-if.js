@@ -19,16 +19,27 @@ export default {
       noElseIf:
         'Unexpected else-if. Use separate if statements or nested if-else blocks instead.',
     },
+    fixable: 'code',
     schema: [],
   },
 
   create(context) {
+    const sourceCode = context.getSourceCode()
+
     return {
       IfStatement(node) {
         if (node.alternate && node.alternate.type === 'IfStatement') {
           context.report({
             node: node.alternate,
             messageId: 'noElseIf',
+            fix(fixer) {
+              const alternateText = sourceCode.getText(node.alternate)
+              const indent = ' '.repeat(node.loc.start.column)
+              return fixer.replaceText(
+                node.alternate,
+                `{\n${indent}  ${alternateText}\n${indent}}`,
+              )
+            },
           })
         }
       },

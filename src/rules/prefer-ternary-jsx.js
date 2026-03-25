@@ -24,10 +24,12 @@ export default {
       preferTernary:
         "Complementary conditions '{{positive}}' and '!{{positive}}' should use a ternary: `{{positive}} ? ... : ...`",
     },
+    fixable: 'code',
     schema: [],
   },
 
   create(context) {
+    const sourceCode = context.getSourceCode()
     function getConditionName(node) {
       if (node.type === 'Identifier') return node.name
       if (
@@ -83,12 +85,23 @@ export default {
           if (a.condition.name !== b.condition.name) continue
           if (a.condition.isNegated === b.condition.isNegated) continue
 
-          // Found complementary pair
-          const positiveName = a.condition.name
+          // Found complementary pair — determine positive vs negated
+          const positive = a.condition.isNegated ? b : a
+          const negative = a.condition.isNegated ? a : b
+          const positiveName = positive.condition.name
+          const positiveJsx = sourceCode.getText(positive.node.expression.right)
+          const negativeJsx = sourceCode.getText(negative.node.expression.right)
+
           context.report({
             node: a.node,
             messageId: 'preferTernary',
             data: { positive: positiveName },
+            fix(fixer) {
+              return fixer.replaceTextRange(
+                [positive.node.range[0], negative.node.range[1]],
+                `{${positiveName} ? ${positiveJsx} : ${negativeJsx}}`,
+              )
+            },
           })
         }
       }

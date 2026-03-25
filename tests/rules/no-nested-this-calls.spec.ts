@@ -58,6 +58,12 @@ describe('no-nested-this-calls', () => {
               return this.format(this.parse("a"))
             }
           }`,
+          output: `class A {
+            m() {
+              const parseResult = this.parse("a")
+              return this.format(parseResult)
+            }
+          }`,
           errors: [{ messageId: 'nestedThisCall' }],
         },
         // String literal property access (covers '?' fallback for outer)
@@ -67,6 +73,12 @@ describe('no-nested-this-calls', () => {
               return this["format"](this.parse("a"))
             }
           }`,
+          output: `class A {
+            m() {
+              const parseResult = this.parse("a")
+              return this["format"](parseResult)
+            }
+          }`,
           errors: [{ messageId: 'nestedThisCall' }],
         },
         // String literal property access (covers '?' fallback for inner)
@@ -74,6 +86,12 @@ describe('no-nested-this-calls', () => {
           code: `class A {
             m() {
               return this.format(this["parse"]("a"))
+            }
+          }`,
+          output: `class A {
+            m() {
+              const callResult = this["parse"]("a")
+              return this.format(callResult)
             }
           }`,
           errors: [{ messageId: 'nestedThisCall' }],
