@@ -26,7 +26,8 @@
   "scripts": {
     "test": "vitest",
     "test:run": "vitest --run",
-    "test:cov": "vitest --run --coverage"
+    "test:cov": "vitest --run --coverage",
+    "prepare": "husky"
   },
   "peerDependencies": {
     "eslint": ">=8.0.0"
@@ -34,6 +35,7 @@
   "devDependencies": {
     "@typescript-eslint/parser": "^8.56.1",
     "eslint": "^8.57.0",
+    "husky": "^9.1.7",
     "typescript": "^5.0.0",
     "vitest": "^3.0.0"
   },
