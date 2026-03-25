@@ -23,6 +23,7 @@ export default {
       category: 'Best Practices',
       recommended: false,
     },
+    fixable: 'code',
     messages: {
       noTernaryFalseFallback:
         'Redundant ternary with `false` fallback. Use `&&` operator or move the logic upstream (e.g., to the selector/view model).',
@@ -40,6 +41,20 @@ export default {
           context.report({
             node,
             messageId: 'noTernaryFalseFallback',
+            fix(fixer) {
+              const sourceCode = context.getSourceCode()
+              const testText = sourceCode.getText(node.test)
+              const consequentText = sourceCode.getText(node.consequent)
+              const needsParens =
+                node.test.type === 'LogicalExpression' ||
+                node.test.type === 'BinaryExpression' ||
+                node.test.type === 'ConditionalExpression'
+              const fixedTest = needsParens ? `(${testText})` : testText
+              return fixer.replaceTextRange(
+                node.range,
+                `${fixedTest} && ${consequentText}`,
+              )
+            },
           })
         }
       },

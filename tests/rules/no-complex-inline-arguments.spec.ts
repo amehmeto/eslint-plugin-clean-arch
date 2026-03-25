@@ -90,41 +90,49 @@ describe('no-complex-inline-arguments', () => {
         // Logical expression with long string - NOT OK
         {
           code: `showToast(foo ?? 'This action is currently disabled')`,
+          output: `const showToastArg = foo ?? 'This action is currently disabled'\nshowToast(showToastArg)`,
           errors: [{ messageId: 'extractArgument' }],
         },
         // Binary expression with long string - NOT OK
         {
           code: `log(prefix + 'This is a very long suffix string')`,
+          output: `const logArg = prefix + 'This is a very long suffix string'\nlog(logArg)`,
           errors: [{ messageId: 'extractArgument' }],
         },
         // Conditional expression with long string - NOT OK
         {
           code: `show(condition ? 'This is a very long true message' : fallback)`,
+          output: `const showArg = condition ? 'This is a very long true message' : fallback\nshow(showArg)`,
           errors: [{ messageId: 'extractArgument' }],
         },
         // || operator with long string - NOT OK
         {
           code: `display(value || 'Default value that is quite long')`,
+          output: `const displayArg = value || 'Default value that is quite long'\ndisplay(displayArg)`,
           errors: [{ messageId: 'extractArgument' }],
         },
         // && operator with long string - NOT OK
         {
           code: `render(isValid && 'This validation message is long')`,
+          output: `const renderArg = isValid && 'This validation message is long'\nrender(renderArg)`,
           errors: [{ messageId: 'extractArgument' }],
         },
         // Nested logical with long string - NOT OK
         {
           code: `fn(a ?? b ?? 'This is a very long fallback string')`,
+          output: `const fnArg = a ?? b ?? 'This is a very long fallback string'\nfn(fnArg)`,
           errors: [{ messageId: 'extractArgument' }],
         },
         // Member expression call - NOT OK
         {
           code: `obj.method(foo ?? 'This is a very long default value')`,
+          output: `const methodArg = foo ?? 'This is a very long default value'\nobj.method(methodArg)`,
           errors: [{ messageId: 'extractArgument' }],
         },
         // Multiple complex args - both flagged
         {
           code: `fn(a ?? 'First long string message', b || 'Second long string message')`,
+          output: `const fnArg = a ?? 'First long string message'\nfn(fnArg, b || 'Second long string message')`,
           errors: [
             { messageId: 'extractArgument' },
             { messageId: 'extractArgument' },
@@ -134,16 +142,19 @@ describe('no-complex-inline-arguments', () => {
         {
           code: `showToast(foo ?? 'Medium length')`,
           options: [{ maxStringLength: 10 }],
+          output: `const showToastArg = foo ?? 'Medium length'\nshowToast(showToastArg)`,
           errors: [{ messageId: 'extractArgument' }],
         },
         // Template literal over threshold - NOT OK
         {
           code: 'fn(foo ?? `This is a very long template string`)',
+          output: 'const fnArg = foo ?? `This is a very long template string`\nfn(fnArg)',
           errors: [{ messageId: 'extractArgument' }],
         },
         // Conditional with long string in alternate - NOT OK
         {
           code: `show(condition ? short : 'This is a very long alternate string')`,
+          output: `const showArg = condition ? short : 'This is a very long alternate string'\nshow(showArg)`,
           errors: [{ messageId: 'extractArgument' }],
         },
       ],

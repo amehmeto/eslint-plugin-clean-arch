@@ -13,6 +13,7 @@ export default {
       category: 'Best Practices',
       recommended: true,
     },
+    fixable: 'code',
     messages: {
       nestedThisCall:
         'Nested this.{{ outer }}(this.{{ inner }}(...)) detected. Extract the inner call to a variable or create a composed method.',
@@ -49,6 +50,23 @@ export default {
               node,
               messageId: 'nestedThisCall',
               data: { outer: outerName, inner: innerName },
+              fix(fixer) {
+                const sourceCode = context.getSourceCode()
+                const varName = innerName !== '?' ? `${innerName}Result` : 'callResult'
+                const exprText = sourceCode.getText(arg)
+                let stmt = node
+                while (stmt.parent && stmt.parent.type !== 'Program' && stmt.parent.type !== 'BlockStatement') {
+                  stmt = stmt.parent
+                }
+                const indent = sourceCode.getText().slice(
+                  sourceCode.getIndexFromLoc({ line: stmt.loc.start.line, column: 0 }),
+                  stmt.range[0]
+                )
+                return [
+                  fixer.insertTextBefore(stmt, `const ${varName} = ${exprText}\n${indent}`),
+                  fixer.replaceText(arg, varName)
+                ]
+              },
             })
           }
         }

@@ -92,6 +92,7 @@ describe('no-nested-call-expressions', () => {
         // Basic nested call - SHOULD report
         {
           code: `foo(bar(x))`,
+          output: `const barResult = bar(x)\nfoo(barResult)`,
           errors: [
             { messageId: 'noNestedCalls', data: { innerCall: 'bar(...)' } },
           ],
@@ -99,6 +100,7 @@ describe('no-nested-call-expressions', () => {
         // Nested method call - SHOULD report
         {
           code: `process(obj.getValue())`,
+          output: `const getValueResult = obj.getValue()\nprocess(getValueResult)`,
           errors: [
             {
               messageId: 'noNestedCalls',
@@ -109,6 +111,7 @@ describe('no-nested-call-expressions', () => {
         // Outer method call with nested function - SHOULD report
         {
           code: `obj.process(inner(x))`,
+          output: `const innerResult = inner(x)\nobj.process(innerResult)`,
           errors: [
             { messageId: 'noNestedCalls', data: { innerCall: 'inner(...)' } },
           ],
@@ -116,6 +119,7 @@ describe('no-nested-call-expressions', () => {
         // Multiple nested calls in same expression - SHOULD report both
         {
           code: `foo(bar(x), baz(y))`,
+          output: `const barResult = bar(x)\nfoo(barResult, baz(y))`,
           errors: [
             { messageId: 'noNestedCalls', data: { innerCall: 'bar(...)' } },
             { messageId: 'noNestedCalls', data: { innerCall: 'baz(...)' } },
@@ -124,6 +128,7 @@ describe('no-nested-call-expressions', () => {
         // With options but neither matches - SHOULD report
         {
           code: `outer(inner(x))`,
+          output: `const innerResult = inner(x)\nouter(innerResult)`,
           options: [{ allowedPatterns: ['^allowed$'] }],
           errors: [
             { messageId: 'noNestedCalls', data: { innerCall: 'inner(...)' } },
@@ -132,6 +137,7 @@ describe('no-nested-call-expressions', () => {
         // Computed property access on inner call - SHOULD report with '...'
         {
           code: `outer(obj['method'](x))`,
+          output: `const callResult = obj['method'](x)\nouter(callResult)`,
           errors: [
             { messageId: 'noNestedCalls', data: { innerCall: '...(...)' } },
           ],
@@ -139,6 +145,7 @@ describe('no-nested-call-expressions', () => {
         // Computed property access on outer call - SHOULD report inner
         {
           code: `obj['method'](inner(x))`,
+          output: `const innerResult = inner(x)\nobj['method'](innerResult)`,
           errors: [
             { messageId: 'noNestedCalls', data: { innerCall: 'inner(...)' } },
           ],
@@ -146,6 +153,7 @@ describe('no-nested-call-expressions', () => {
         // IIFE as inner call (callee is FunctionExpression) - SHOULD report with '...'
         {
           code: `outer((function() { return 1 })(x))`,
+          output: `const callResult = (function() { return 1 })(x)\nouter(callResult)`,
           errors: [
             { messageId: 'noNestedCalls', data: { innerCall: '...(...)' } },
           ],
@@ -153,6 +161,7 @@ describe('no-nested-call-expressions', () => {
         // allowNoArguments: still reports when inner call HAS arguments (non-dispatch)
         {
           code: `process(createAction(payload))`,
+          output: `const createActionResult = createAction(payload)\nprocess(createActionResult)`,
           options: [{ allowNoArguments: true }],
           errors: [
             {
@@ -164,6 +173,7 @@ describe('no-nested-call-expressions', () => {
         // NewExpression as argument - SHOULD report
         {
           code: `Promise.reject(new Error(msg))`,
+          output: `const ErrorResult = new Error(msg)\nPromise.reject(ErrorResult)`,
           errors: [
             {
               messageId: 'noNestedCalls',
@@ -174,6 +184,7 @@ describe('no-nested-call-expressions', () => {
         // NewExpression with allowNoArguments but HAS arguments - SHOULD report
         {
           code: `foo(new Error(msg))`,
+          output: `const ErrorResult = new Error(msg)\nfoo(ErrorResult)`,
           options: [{ allowNoArguments: true }],
           errors: [
             {

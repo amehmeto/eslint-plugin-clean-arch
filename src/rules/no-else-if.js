@@ -19,16 +19,32 @@ export default {
       noElseIf:
         'Unexpected else-if. Use separate if statements or nested if-else blocks instead.',
     },
+    fixable: 'code',
     schema: [],
   },
 
   create(context) {
+    const sourceCode = context.getSourceCode()
+
     return {
       IfStatement(node) {
         if (node.alternate && node.alternate.type === 'IfStatement') {
           context.report({
             node: node.alternate,
             messageId: 'noElseIf',
+            fix(fixer) {
+              const alternateText = sourceCode.getText(node.alternate)
+              const baseIndent = ' '.repeat(node.loc.start.column)
+              const innerIndent = baseIndent + '  '
+              const reindented = alternateText
+                .split('\n')
+                .map((line, i) => (i === 0 ? line : innerIndent + line.trimStart()))
+                .join('\n')
+              return fixer.replaceText(
+                node.alternate,
+                `{\n${innerIndent}${reindented}\n${baseIndent}}`,
+              )
+            },
           })
         }
       },

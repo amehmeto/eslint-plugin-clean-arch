@@ -17,6 +17,7 @@ export default {
       tooMany:
         'This line has {{ count }} statements. Maximum allowed is {{ max }}.',
     },
+    fixable: 'code',
     schema: [
       {
         type: 'object',
@@ -29,6 +30,7 @@ export default {
   },
 
   create(context) {
+    const sourceCode = context.getSourceCode()
     const max = (context.options[0] && context.options[0].max) || 1
 
     function checkStatements(statements) {
@@ -47,6 +49,15 @@ export default {
             node: stmts[max],
             messageId: 'tooMany',
             data: { count: String(stmts.length), max: String(max) },
+            fix(fixer) {
+              const indent = ' '.repeat(stmts[0].loc.start.column)
+              const fixes = []
+              for (let i = max; i < stmts.length; i++) {
+                const token = sourceCode.getTokenBefore(stmts[i])
+                if (token) fixes.push(fixer.insertTextAfter(token, `\n${indent}`))
+              }
+              return fixes
+            },
           })
     }
 

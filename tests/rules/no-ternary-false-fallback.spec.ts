@@ -38,14 +38,17 @@ describe('no-ternary-false-fallback', () => {
       invalid: [
         {
           code: `const isDisabled = viewModel.type === 'SUCCESS' ? viewModel.isDisabled : false`,
+          output: `const isDisabled = (viewModel.type === 'SUCCESS') && viewModel.isDisabled`,
           errors: [{ messageId: 'noTernaryFalseFallback' }],
         },
         {
           code: `const result = x ? fn(x) : false`,
+          output: `const result = x && fn(x)`,
           errors: [{ messageId: 'noTernaryFalseFallback' }],
         },
         {
           code: `const isActive = condition ? someCheck() : false`,
+          output: `const isActive = condition && someCheck()`,
           errors: [{ messageId: 'noTernaryFalseFallback' }],
         },
       ],

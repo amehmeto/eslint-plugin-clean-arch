@@ -24,6 +24,7 @@ export default {
       category: 'Best Practices',
       recommended: false,
     },
+    fixable: 'code',
     messages: {
       noRedundantNullishTernary:
         'Redundant nullish ternary: "{{ functionName }}" should handle null/undefined inputs instead of the caller guarding with a ternary.',
@@ -110,6 +111,10 @@ export default {
           node,
           messageId: 'noRedundantNullishTernary',
           data: { functionName: getFunctionName(callExpr) },
+          fix(fixer) {
+            const sourceCode = context.getSourceCode()
+            return fixer.replaceText(node, sourceCode.getText(callExpr))
+          },
         })
       },
     }

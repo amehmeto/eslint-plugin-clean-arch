@@ -52,6 +52,7 @@ describe('no-i-prefix-in-imports', () => {
         // I-prefix alias - NOT OK
         {
           code: `import { Foo as IFoo } from './foo'`,
+          output: `import { Foo } from './foo'`,
           errors: [
             {
               messageId: 'noIPrefixInImport',
@@ -62,6 +63,7 @@ describe('no-i-prefix-in-imports', () => {
         // I-prefix with longer name - NOT OK
         {
           code: `import { AuthGateway as IAuthGateway } from './auth.gateway'`,
+          output: `import { AuthGateway } from './auth.gateway'`,
           errors: [
             {
               messageId: 'noIPrefixInImport',
@@ -72,6 +74,7 @@ describe('no-i-prefix-in-imports', () => {
         // Multiple I-prefix imports - NOT OK
         {
           code: `import { Foo as IFoo, Bar as IBar } from './types'`,
+          output: `import { Foo, Bar } from './types'`,
           errors: [
             { messageId: 'noIPrefixInImport', data: { alias: 'IFoo' } },
             { messageId: 'noIPrefixInImport', data: { alias: 'IBar' } },
@@ -80,6 +83,7 @@ describe('no-i-prefix-in-imports', () => {
         // I-prefix with Repository - NOT OK
         {
           code: `import { BlockSessionRepository as IBlockSessionRepository } from './ports'`,
+          output: `import { BlockSessionRepository } from './ports'`,
           errors: [
             {
               messageId: 'noIPrefixInImport',

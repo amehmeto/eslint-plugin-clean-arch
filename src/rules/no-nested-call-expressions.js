@@ -60,6 +60,7 @@ export default {
       category: 'Best Practices',
       recommended: false,
     },
+    fixable: 'code',
     messages: {
       noNestedCalls:
         'Avoid nested function calls. Extract `{{innerCall}}` to a variable first.',
@@ -121,6 +122,24 @@ export default {
       return alwaysAllowedOuter.includes(name)
     }
 
+    function extractToVariable(fixer, outerNode, innerName, arg) {
+      const sourceCode = context.getSourceCode()
+      const varName = innerName !== '...' ? `${innerName}Result` : 'callResult'
+      const exprText = sourceCode.getText(arg)
+      let stmt = outerNode
+      while (stmt.parent && stmt.parent.type !== 'Program' && stmt.parent.type !== 'BlockStatement') {
+        stmt = stmt.parent
+      }
+      const indent = sourceCode.getText().slice(
+        sourceCode.getIndexFromLoc({ line: stmt.loc.start.line, column: 0 }),
+        stmt.range[0]
+      )
+      return [
+        fixer.insertTextBefore(stmt, `const ${varName} = ${exprText}\n${indent}`),
+        fixer.replaceText(arg, varName)
+      ]
+    }
+
     return {
       CallExpression(node) {
         const outerName = getCallName(node)
@@ -137,6 +156,9 @@ export default {
               node: arg,
               messageId: 'noNestedCalls',
               data: { innerCall: `${innerName}(...)` },
+              fix(fixer) {
+                return extractToVariable(fixer, node, innerName, arg)
+              },
             })
           }
 
@@ -151,6 +173,9 @@ export default {
               node: arg,
               messageId: 'noNestedCalls',
               data: { innerCall: `new ${innerName}(...)` },
+              fix(fixer) {
+                return extractToVariable(fixer, node, innerName, arg)
+              },
             })
           }
         }

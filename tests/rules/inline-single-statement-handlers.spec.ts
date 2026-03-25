@@ -106,6 +106,9 @@ describe('inline-single-statement-handlers', () => {
           doSomething()
         }
       `,
+          output: `
+        const handleClick = () => doSomething()
+      `,
           filename: 'Component.tsx',
           errors: [
             { messageId: 'shouldInline', data: { name: 'handleClick' } },
@@ -118,12 +121,20 @@ describe('inline-single-statement-handlers', () => {
           doSomething()
         }
       `,
+          output: `
+        const onClick = () => doSomething()
+      `,
           filename: 'Component.tsx',
           errors: [{ messageId: 'shouldInline', data: { name: 'onClick' } }],
         },
         // Single return statement - SHOULD report
         {
           code: `
+        const handleChange = () => {
+          return getValue()
+        }
+      `,
+          output: `
         const handleChange = () => {
           return getValue()
         }

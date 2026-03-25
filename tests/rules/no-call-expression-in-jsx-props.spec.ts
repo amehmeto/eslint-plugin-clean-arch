@@ -81,6 +81,7 @@ describe('no-call-expression-in-jsx-props', () => {
         // Call with arguments in prop - INVALID
         {
           code: '<Switch isSelected={isSirenSelected(SirenType.ANDROID, item.packageName)} />',
+          output: 'const isSelected = isSirenSelected(SirenType.ANDROID, item.packageName);\n<Switch isSelected={isSelected} />',
           errors: [
             {
               messageId: 'extractCallExpression',
@@ -91,6 +92,7 @@ describe('no-call-expression-in-jsx-props', () => {
         // Method call with arguments - INVALID
         {
           code: '<Button style={styles.getStyle(theme)} />',
+          output: 'const style = styles.getStyle(theme);\n<Button style={style} />',
           errors: [
             {
               messageId: 'extractCallExpression',
@@ -101,6 +103,7 @@ describe('no-call-expression-in-jsx-props', () => {
         // Multiple props with calls - INVALID (both)
         {
           code: '<Component a={fn1(x)} b={fn2(y)} />',
+          output: 'const a = fn1(x);\n<Component a={a} b={fn2(y)} />',
           errors: [
             {
               messageId: 'extractCallExpression',
@@ -115,6 +118,7 @@ describe('no-call-expression-in-jsx-props', () => {
         // Call without arguments when option disabled - INVALID
         {
           code: '<Component value={getValue()} />',
+          output: 'const value = getValue();\n<Component value={value} />',
           options: [{ allowNoArguments: false }],
           errors: [
             {
@@ -126,6 +130,7 @@ describe('no-call-expression-in-jsx-props', () => {
         // Computed property access method call - INVALID
         {
           code: '<Component value={obj["method"](x)} />',
+          output: 'const value = obj["method"](x);\n<Component value={value} />',
           errors: [
             {
               messageId: 'extractCallExpression',
@@ -136,6 +141,7 @@ describe('no-call-expression-in-jsx-props', () => {
         // IIFE in JSX prop (callee is FunctionExpression) - INVALID
         {
           code: '<Component value={(function() { return 1 })()} />',
+          output: 'const value = (function() { return 1 })();\n<Component value={value} />',
           options: [{ allowNoArguments: false }],
           errors: [
             {

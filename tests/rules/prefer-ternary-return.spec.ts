@@ -177,6 +177,11 @@ describe('prefer-ternary-return', () => {
               return 2
             }
           `,
+          output: `
+            function foo(x) {
+              return x ? 1 : 2
+            }
+          `,
           errors: [
             {
               messageId: 'preferTernary',
@@ -194,6 +199,11 @@ describe('prefer-ternary-return', () => {
               return 2
             }
           `,
+          output: `
+            function foo(x) {
+              return x ? 1 : 2
+            }
+          `,
           errors: [
             {
               messageId: 'preferTernary',
@@ -207,6 +217,11 @@ describe('prefer-ternary-return', () => {
             function foo(x, y) {
               if (x && y) return 'yes'
               return 'no'
+            }
+          `,
+          output: `
+            function foo(x, y) {
+              return x && y ? 'yes' : 'no'
             }
           `,
           errors: [
@@ -228,6 +243,11 @@ describe('prefer-ternary-return', () => {
               return x.value
             }
           `,
+          output: `
+            function foo(x) {
+              return !x ? null : x.value
+            }
+          `,
           errors: [
             {
               messageId: 'preferTernary',
@@ -245,6 +265,11 @@ describe('prefer-ternary-return', () => {
             function isValid(x) {
               if (x > 10) return true
               return false
+            }
+          `,
+          output: `
+            function isValid(x) {
+              return x > 10 ? true : false
             }
           `,
           errors: [
@@ -266,6 +291,11 @@ describe('prefer-ternary-return', () => {
               return <Content />
             }
           `,
+          output: `
+            function Comp(props) {
+              return props.loading ? <Loading /> : <Content />
+            }
+          `,
           errors: [
             {
               messageId: 'preferTernary',
@@ -278,6 +308,11 @@ describe('prefer-ternary-return', () => {
             function Comp(props) {
               if (props.loading) return <Loading />
               return <Content />
+            }
+          `,
+          output: `
+            function Comp(props) {
+              return props.loading ? <Loading /> : <Content />
             }
           `,
           options: [{ skipJsx: false }],
@@ -293,6 +328,11 @@ describe('prefer-ternary-return', () => {
             function foo(x) {
               if (x) return 'this is a very long string literal'
               return 'short'
+            }
+          `,
+          output: `
+            function foo(x) {
+              return x ? 'this is a very long string literal' : 'short'
             }
           `,
           errors: [
@@ -312,6 +352,11 @@ describe('prefer-ternary-return', () => {
             function foo(x, y) {
               if (x) return 1
               return y ? 2 : 3
+            }
+          `,
+          output: `
+            function foo(x, y) {
+              return x ? 1 : y ? 2 : 3
             }
           `,
           errors: [

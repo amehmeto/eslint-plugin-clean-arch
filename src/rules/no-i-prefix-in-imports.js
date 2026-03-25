@@ -17,6 +17,7 @@ export default {
       description: 'Forbid I-prefix in import aliases (TypeScript convention)',
       category: 'Stylistic Issues',
     },
+    fixable: 'code',
     messages: {
       noIPrefixInImport:
         "Import alias '{{ alias }}' should not use I-prefix. Consider a more descriptive name or import without an alias.",
@@ -36,6 +37,9 @@ export default {
             node: node.local,
             messageId: 'noIPrefixInImport',
             data: { alias },
+            fix(fixer) {
+              return fixer.replaceText(node, node.imported.name)
+            },
           })
         }
       },

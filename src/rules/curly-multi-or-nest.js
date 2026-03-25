@@ -14,7 +14,7 @@ export default {
       category: 'Best Practices',
       recommended: false,
     },
-    fixable: null,
+    fixable: 'code',
     messages: {
       needsBraces:
         'Expected curly braces around {{ keyword }} body containing multiple statements or nested block.',
@@ -25,6 +25,8 @@ export default {
   },
 
   create(context) {
+    const sourceCode = context.getSourceCode()
+
     function isNested(node) {
       return (
         node.type === 'IfStatement' ||
@@ -51,6 +53,13 @@ export default {
             node: body,
             messageId: 'unnecessaryBraces',
             data: { keyword },
+            fix(fixer) {
+              const stmtText = sourceCode.getText(stmt)
+              // do-while requires a semicolon after the body statement
+              if (node.type === 'DoWhileStatement' && !stmtText.endsWith(';'))
+                return fixer.replaceText(body, stmtText + ';')
+              return fixer.replaceText(body, stmtText)
+            },
           })
         }
       } else if (isNested(body)) {
@@ -59,6 +68,14 @@ export default {
           node: body,
           messageId: 'needsBraces',
           data: { keyword },
+          fix(fixer) {
+            const bodyText = sourceCode.getText(body)
+            const indent = ' '.repeat(node.loc.start.column)
+            return fixer.replaceText(
+              body,
+              `{\n${indent}  ${bodyText}\n${indent}}`,
+            )
+          },
         })
       }
     }

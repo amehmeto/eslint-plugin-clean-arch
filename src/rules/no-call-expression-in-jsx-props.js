@@ -15,6 +15,7 @@ export default {
       category: 'Best Practices',
       recommended: false,
     },
+    fixable: 'code',
     messages: {
       extractCallExpression:
         'Extract `{{call}}` to a variable before passing to JSX prop `{{prop}}`.',
@@ -98,6 +99,24 @@ export default {
             data: {
               call: getCallText(expression),
               prop: propName,
+            },
+            fix(fixer) {
+              const sourceCode = context.getSourceCode()
+              const varName = propName
+              const exprText = sourceCode.getText(expression)
+              let stmt = node
+              while (stmt.parent && stmt.parent.type !== 'Program' && stmt.parent.type !== 'BlockStatement') {
+                stmt = stmt.parent
+              }
+              const indent = sourceCode.getText().slice(
+                sourceCode.getIndexFromLoc({ line: stmt.loc.start.line, column: 0 }),
+                stmt.range[0]
+              )
+              return [
+                // Semicolon required: without it, `const x = fn()\n<JSX />` parses `<` as less-than
+                fixer.insertTextBefore(stmt, `const ${varName} = ${exprText};\n${indent}`),
+                fixer.replaceText(expression, varName)
+              ]
             },
           })
         }

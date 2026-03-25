@@ -48,26 +48,38 @@ describe('no-consecutive-duplicate-returns', () => {
         // Basic case
         {
           code: `function f() { if (!a) return EMPTY; if (!b) return EMPTY; }`,
+          output: `function f() { if (!a || !b) return EMPTY }`,
           errors: [{ messageId: 'mergeReturns' }],
         },
         // Block body
         {
           code: `function f() { if (!a) { return EMPTY; } if (!b) { return EMPTY; } }`,
+          output: `function f() { if (!a || !b) return EMPTY }`,
           errors: [{ messageId: 'mergeReturns' }],
         },
         // Returning null
         {
           code: `function f() { if (!a) return null; if (!b) return null; }`,
+          output: `function f() { if (!a || !b) return null }`,
           errors: [{ messageId: 'mergeReturns' }],
         },
         // Returning undefined
         {
           code: `function f() { if (!a) return; if (!b) return; }`,
+          output: `function f() { if (!a || !b) return }`,
           errors: [{ messageId: 'mergeReturns' }],
         },
         // Three consecutive (reports on 2nd and 3rd)
         {
-          code: `function f() { if (!a) return EMPTY; if (!b) return EMPTY; if (!c) return EMPTY; }`,
+          code: `function f() {
+  if (!a) return EMPTY
+  if (!b) return EMPTY
+  if (!c) return EMPTY
+}`,
+          output: `function f() {
+  if (!a || !b) return EMPTY
+  if (!c) return EMPTY
+}`,
           errors: [
             { messageId: 'mergeReturns' },
             { messageId: 'mergeReturns' },
@@ -76,6 +88,7 @@ describe('no-consecutive-duplicate-returns', () => {
         // Real-world case
         {
           code: `function select(state, dateProvider, blocklistId) { if (!blocklistId) return EMPTY_LOCKED_SIRENS; if (!isActive(state, dateProvider)) return EMPTY_LOCKED_SIRENS; }`,
+          output: `function select(state, dateProvider, blocklistId) { if (!blocklistId || !isActive(state, dateProvider)) return EMPTY_LOCKED_SIRENS }`,
           errors: [{ messageId: 'mergeReturns' }],
         },
       ],

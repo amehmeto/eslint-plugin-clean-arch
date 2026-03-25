@@ -16,6 +16,7 @@ export default {
       category: 'Best Practices',
       recommended: true,
     },
+    fixable: 'code',
     messages: {
       useEnumValue:
         "Use '{{enumName}}.{{memberName}}' instead of string literal '{{value}}'.",
@@ -81,6 +82,9 @@ export default {
               enumName: enumEntry.enumName,
               memberName: enumEntry.memberName,
               value: literal.value,
+            },
+            fix(fixer) {
+              return fixer.replaceText(literal, `${enumEntry.enumName}.${enumEntry.memberName}`)
             },
           })
         }

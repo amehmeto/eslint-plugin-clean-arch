@@ -90,16 +90,19 @@ if (x) {
         // Braces around single non-nested statement - NOT OK
         {
           code: `if (x) { doSomething() }`,
+          output: `if (x) doSomething()`,
           errors: [{ messageId: 'unnecessaryBraces', data: { keyword: 'if' } }],
         },
         // Nested control flow without braces - NOT OK (needs braces)
         {
           code: `if (x) if (y) doSomething()`,
+          output: `if (x) {\n  if (y) doSomething()\n}`,
           errors: [{ messageId: 'needsBraces', data: { keyword: 'if' } }],
         },
         // While with unnecessary braces around single statement - NOT OK
         {
           code: `while (x) { doSomething() }`,
+          output: `while (x) doSomething()`,
           errors: [
             { messageId: 'unnecessaryBraces', data: { keyword: 'while' } },
           ],
@@ -107,6 +110,7 @@ if (x) {
         // For with unnecessary braces around single statement - NOT OK
         {
           code: `for (let i = 0; i < 10; i++) { doSomething() }`,
+          output: `for (let i = 0; i < 10; i++) doSomething()`,
           errors: [
             { messageId: 'unnecessaryBraces', data: { keyword: 'for' } },
           ],
@@ -117,6 +121,10 @@ if (x) {
 if (x) doA()
 else { doB() }
 `,
+          output: `
+if (x) doA()
+else doB()
+`,
           errors: [
             { messageId: 'unnecessaryBraces', data: { keyword: 'else' } },
           ],
@@ -124,6 +132,7 @@ else { doB() }
         // For-in with unnecessary braces - NOT OK
         {
           code: `for (const k in obj) { doSomething(k) }`,
+          output: `for (const k in obj) doSomething(k)`,
           errors: [
             { messageId: 'unnecessaryBraces', data: { keyword: 'for-in' } },
           ],
@@ -131,6 +140,7 @@ else { doB() }
         // Do-while with unnecessary braces around single statement - NOT OK
         {
           code: `do { doSomething() } while (x)`,
+          output: `do doSomething(); while (x)`,
           errors: [
             { messageId: 'unnecessaryBraces', data: { keyword: 'do-while' } },
           ],

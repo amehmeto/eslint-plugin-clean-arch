@@ -58,6 +58,7 @@ function foo() {
         // Two statements on one line - NOT OK
         {
           code: `const a = 1; const b = 2`,
+          output: `const a = 1;\n const b = 2`,
           errors: [
             {
               messageId: 'tooMany',
@@ -68,6 +69,7 @@ function foo() {
         // Three statements on one line - NOT OK
         {
           code: `const a = 1; const b = 2; const c = 3`,
+          output: `const a = 1;\n const b = 2;\n const c = 3`,
           errors: [
             {
               messageId: 'tooMany',
@@ -79,6 +81,9 @@ function foo() {
         {
           code: `
 function foo() { const a = 1; const b = 2 }
+`,
+          output: `
+function foo() { const a = 1;\n                  const b = 2 }
 `,
           errors: [
             {

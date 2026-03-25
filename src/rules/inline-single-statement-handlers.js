@@ -18,6 +18,7 @@ export default {
       shouldInline:
         'Single-statement handler "{{name}}" should be inlined. Consider using an arrow function directly at the call site instead of defining a separate function.',
     },
+    fixable: 'code',
     schema: [],
   },
 
@@ -50,10 +51,16 @@ export default {
         if (body.body.length !== 1) return
 
         // Report single-statement handlers
+        const stmt = body.body[0]
         context.report({
           node,
           messageId: 'shouldInline',
           data: { name },
+          fix(fixer) {
+            if (stmt.type !== 'ExpressionStatement') return null
+            const sourceCode = context.getSourceCode()
+            return fixer.replaceText(body, sourceCode.getText(stmt.expression))
+          },
         })
       },
     }

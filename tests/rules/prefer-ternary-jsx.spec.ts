@@ -49,6 +49,7 @@ describe('prefer-ternary-jsx', () => {
         // Simple complementary conditions
         {
           code: `<div>{isLocked && <LockIcon />}{!isLocked && <CheckBox />}</div>`,
+          output: `<div>{isLocked ? <LockIcon /> : <CheckBox />}</div>`,
           errors: [
             {
               messageId: 'preferTernary',
@@ -59,6 +60,7 @@ describe('prefer-ternary-jsx', () => {
         // Negation first, positive second
         {
           code: `<div>{!isLocked && <CheckBox />}{isLocked && <LockIcon />}</div>`,
+          output: `<div>{isLocked ? <LockIcon /> : <CheckBox />}</div>`,
           errors: [
             {
               messageId: 'preferTernary',
@@ -69,6 +71,7 @@ describe('prefer-ternary-jsx', () => {
         // With other children in between
         {
           code: `<div>{isLocked && <LockIcon />}<Text>hello</Text>{!isLocked && <CheckBox />}</div>`,
+          output: `<div>{isLocked ? <LockIcon /> : <CheckBox />}</div>`,
           errors: [
             {
               messageId: 'preferTernary',
@@ -79,6 +82,7 @@ describe('prefer-ternary-jsx', () => {
         // Member expression condition
         {
           code: `<div>{user.isAdmin && <AdminPanel />}{!user.isAdmin && <UserPanel />}</div>`,
+          output: `<div>{user.isAdmin ? <AdminPanel /> : <UserPanel />}</div>`,
           errors: [
             {
               messageId: 'preferTernary',
@@ -89,6 +93,7 @@ describe('prefer-ternary-jsx', () => {
         // Inside a fragment
         {
           code: `<>{isLocked && <LockIcon />}{!isLocked && <CheckBox />}</>`,
+          output: `<>{isLocked ? <LockIcon /> : <CheckBox />}</>`,
           errors: [
             {
               messageId: 'preferTernary',
