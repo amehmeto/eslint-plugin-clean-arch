@@ -135,7 +135,7 @@ export default {
         stmt.range[0]
       )
       return [
-        fixer.insertTextBefore(stmt, `const ${varName} = ${exprText};\n${indent}`),
+        fixer.insertTextBefore(stmt, `const ${varName} = ${exprText}\n${indent}`),
         fixer.replaceText(arg, varName)
       ]
     }

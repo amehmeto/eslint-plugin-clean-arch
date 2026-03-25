@@ -60,7 +60,7 @@ describe('no-nested-this-calls', () => {
           }`,
           output: `class A {
             m() {
-              const parseResult = this.parse("a");
+              const parseResult = this.parse("a")
               return this.format(parseResult)
             }
           }`,
@@ -75,7 +75,7 @@ describe('no-nested-this-calls', () => {
           }`,
           output: `class A {
             m() {
-              const parseResult = this.parse("a");
+              const parseResult = this.parse("a")
               return this["format"](parseResult)
             }
           }`,
@@ -90,7 +90,7 @@ describe('no-nested-this-calls', () => {
           }`,
           output: `class A {
             m() {
-              const callResult = this["parse"]("a");
+              const callResult = this["parse"]("a")
               return this.format(callResult)
             }
           }`,

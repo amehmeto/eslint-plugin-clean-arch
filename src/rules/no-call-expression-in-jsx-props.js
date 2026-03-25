@@ -113,6 +113,7 @@ export default {
                 stmt.range[0]
               )
               return [
+                // Semicolon required: without it, `const x = fn()\n<JSX />` parses `<` as less-than
                 fixer.insertTextBefore(stmt, `const ${varName} = ${exprText};\n${indent}`),
                 fixer.replaceText(expression, varName)
               ]
