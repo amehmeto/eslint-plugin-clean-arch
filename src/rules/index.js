@@ -30,6 +30,7 @@ import noDateNow from './no-date-now.js'
 import noElseIf from './no-else-if.js'
 import noEntireStateSelector from './no-entire-state-selector.js'
 import noEnumValueAsStringLiteral from './no-enum-value-as-string-literal.js'
+import noHardcodedColorInJsx from './no-hardcoded-color-in-jsx.js'
 import noGenericResultVariable from './no-generic-result-variable.js'
 import noIPrefixInImports from './no-i-prefix-in-imports.js'
 import noIconSizeMagicNumbers from './no-icon-size-magic-numbers.js'
@@ -122,6 +123,7 @@ export default {
   'no-else-if': noElseIf,
   'no-entire-state-selector': noEntireStateSelector,
   'no-enum-value-as-string-literal': noEnumValueAsStringLiteral,
+  'no-hardcoded-color-in-jsx': noHardcodedColorInJsx,
   'no-generic-result-variable': noGenericResultVariable,
   'no-i-prefix-in-imports': noIPrefixInImports,
   'no-icon-size-magic-numbers': noIconSizeMagicNumbers,
