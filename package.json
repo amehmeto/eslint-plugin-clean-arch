@@ -42,5 +42,6 @@
   "license": "MIT",
   "engines": {
     "node": ">=18"
-  }
+  },
+  "packageManager": "bun@1.4.4"
 }
